@@ -86,17 +86,15 @@ Developer → GitHub Repository → GitHub Actions (Self-Hosted Runner)
 
 ---
 
-## Table of Contents
+## Implementation
+## Prerequisites
 
-- [Ports to Enable in Security Group](#ports-to-enable-in-security-group)
-- [Prerequisites](#prerequisites)
+- AWS EC2 instance (Ubuntu 20.04+)
+- GitHub repository.
 - [System Update & Common Packages](#system-update--common-packages)
-- [Docker](#docker)
-- [Trivy (Vulnerability Scanner)](#trivy-vulnerability-scanner)
-- [SonarQube (Docker)](#sonarqube-docker)
-- [npm Installation](#npm-installation)
-
-
+- Docker Hub account for hosting container images.
+- Email account (with app password for notifications).
+- Domain name (optional) for accessing your site.
 
 ---
 
@@ -196,6 +194,8 @@ docker run -d --name sonarqube \
   sonarqube:lts-community
 ```
 
+> **Access SonarQube UI:** `http://<EC2-IP>:9000` (default credentials: admin/admin – change on first login).
+
 ---
 
 ## npm Installation
@@ -232,4 +232,3 @@ npm -v # Should print "10.9.3"
 | Docker-username    | DOCKER_PASSWORD   | token   | From your Docker Hub token       |
 | sonar-qube    | follow the same step
 
-## features and actions of github
