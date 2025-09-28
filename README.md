@@ -1,14 +1,103 @@
-# GitHub Actions Self-Hosted Runnner Amazon Website CICD DevOps — Setup Guide
+# **Amazon Website CI/CD Pipeline with GitHub Actions, SonarQube, Trivy, and Docker**
 
+## **Overview**
+This project demonstrates how to set up a **CI/CD pipeline** for an Amazon-style e-commerce website using **GitHub Actions** with a **self-hosted runner**.  
 
-## For more projects, check out  
-## [https://harishnshetty.github.io/projects.html](https://harishnshetty.github.io/projects.html)
-## [youtube-Link](https://www.youtube.com/@devopsHarishNShetty)
+The pipeline automates the following steps:
+1. **Code Quality Check** → Using **SonarQube** hosted on AWS EC2.  
+2. **Vulnerability Scan** → Using **Trivy** to scan Docker images before deployment.  
+3. **Docker Build & Push** → Builds an optimized Docker image and pushes it to **Docker Hub**.  
+4. **Deployment** → Run the Docker container on an AWS EC2 instance.  
+5. **Notifications** → Email notifications for pipeline status.
+
+> **Why Self-Hosted Runner?**  
+> A self-hosted runner gives more **control**, **faster builds**, and **direct access** to your private cloud resources like EC2 and SonarQube.
+
+---
+
+## **Pipeline Data Flow**
+
+```text
+Developer → GitHub Repository → GitHub Actions (Self-Hosted Runner)
+                                       │
+                ┌──────────────────────┼──────────────────────┐
+                │                      │                      │
+        SonarQube Code Analysis     Trivy Vulnerability Scan
+                │                      │
+                └───────────────> Docker Build & Push
+                                      │
+                                  Docker Hub
+                                      │
+                                  AWS EC2 Deploy
+                                      │
+                                Email Notifications
+```
 
 ---
 ![img alt](https://github.com/harishnshetty/GitHub-Action-Amazon-DevSecOps/blob/bd54e7fd5d2ce24b50614b51ceb390dc6f860334/img.png)
 ---
 
+
+---
+
+## **How It Works**
+
+### **1. Code Push → GitHub Actions Trigger**
+- When you **push code** or create a **pull request**, GitHub Actions automatically triggers the pipeline defined in `.github/workflows/main.yml`.
+
+---
+
+### **2. Code Quality Analysis with SonarQube**
+- **SonarQube**, running in a Docker container on an EC2 instance, analyzes:
+  - Code smells  
+  - Bugs  
+  - Vulnerabilities  
+  - Code coverage
+- The results are accessible from the SonarQube web dashboard.
+
+---
+
+### **3. Vulnerability Scanning with Trivy**
+- Trivy scans the **Docker image** for known vulnerabilities **before deploying**.
+- If vulnerabilities are found, the pipeline **fails early**, preventing insecure deployments.
+
+---
+
+### **4. Build & Push Docker Image**
+- The pipeline uses a **multi-stage Dockerfile** to create a **lightweight, production-ready image**.
+- The image is tagged with:
+  - `latest`  
+  - Git commit SHA (for traceability).
+- The image is pushed securely to **Docker Hub** using GitHub Secrets for authentication.
+
+---
+
+### **5. Deploy on AWS EC2**
+- The EC2 instance pulls the image from Docker Hub and runs it as a container.
+- Your Amazon Website is then accessible over the public IP of EC2.
+
+---
+
+### **6. Email Notification**
+- The final stage sends an email with:
+  - Pipeline status (Success/Failure)
+  - Commit details
+  - Links to logs or reports
+
+---
+
+## **Architecture Diagram**
+
+```mermaid
+graph TD
+    A[Developer] --> B[GitHub Repository]
+    B --> C[GitHub Actions Self-Hosted Runner]
+    C --> D[SonarQube Code Quality Check]
+    C --> E[Trivy Vulnerability Scan]
+    E --> F[Docker Build & Push to Docker Hub]
+    F --> G[AWS EC2 Deployment]
+    G --> H[User Accesses Application]
+    C --> I[Email Notification]
 
 
 ---
