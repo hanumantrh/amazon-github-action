@@ -272,4 +272,4 @@ $ ./run.sh
 
 ```
 ---
-> For additional details about configuring, running, or shutting down the runner, please check out our https://docs.github.com/en/actions/how-tos/manage-runners/self-hosted-runners
+> For additional details about configuring, running, or shutting down the runner, please check out https://docs.github.com/en/actions/how-tos/manage-runners/self-hosted-runners
