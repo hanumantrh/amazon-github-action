@@ -86,22 +86,6 @@ Developer → GitHub Repository → GitHub Actions (Self-Hosted Runner)
 
 ---
 
-## **Architecture Diagram**
-
-```mermaid
-graph TD
-    A[Developer] --> B[GitHub Repository]
-    B --> C[GitHub Actions Self-Hosted Runner]
-    C --> D[SonarQube Code Quality Check]
-    C --> E[Trivy Vulnerability Scan]
-    E --> F[Docker Build & Push to Docker Hub]
-    F --> G[AWS EC2 Deployment]
-    G --> H[User Accesses Application]
-    C --> I[Email Notification]
-
-
----
-
 ## Table of Contents
 
 - [Ports to Enable in Security Group](#ports-to-enable-in-security-group)
