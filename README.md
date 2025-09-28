@@ -159,4 +159,4 @@ npm -v # Should print "10.9.3"
 | Docker-username    | DOCKER_PASSWORD   | token   | From your Docker Hub token       |
 | sonar-qube    | follow the same step
 
-## features and actions
+## features and actions of github
