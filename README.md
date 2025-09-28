@@ -34,7 +34,7 @@ Developer → GitHub Repository → GitHub Actions (Self-Hosted Runner)
 ```
 
 ---
-![img alt](https://github.com/harishnshetty/GitHub-Action-Amazon-DevSecOps/blob/bd54e7fd5d2ce24b50614b51ceb390dc6f860334/img.png)
+![img alt](https://github.com/hanumantrh/amazon-github-action/blob/main/image.png?raw=true)
 ---
 
 
@@ -91,7 +91,6 @@ Developer → GitHub Repository → GitHub Actions (Self-Hosted Runner)
 
 - AWS EC2 instance (Ubuntu 20.04+)
 - GitHub repository.
-- [System Update & Common Packages](#system-update--common-packages)
 - Docker Hub account for hosting container images.
 - Email account (with app password for notifications).
 - Domain name (optional) for accessing your site.
