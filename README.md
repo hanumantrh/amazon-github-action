@@ -219,8 +219,6 @@ nvm current # Should print "v22.18.0"
 npm -v # Should print "10.9.3"
 ```
 
-
-
 ## Github Credentials to Store
 
 | Purpose       | ID            | Type          | Notes                               |
@@ -231,3 +229,45 @@ npm -v # Should print "10.9.3"
 | Docker-username    | DOCKER_PASSWORD   | token   | From your Docker Hub token       |
 | sonar-qube    | follow the same step
 
+---
+
+## GitHub Actions Self-Hosted Runner Setup
+
+GitHub Actions allows you to run workflows on your **own server** using a self-hosted runner.
+
+### 1. Runner Requirements
+- OS: Linux  
+- Architecture: Match your server architecture (x64, ARM, etc.)
+
+### 2. Download and Install Runner
+```bash
+# Create a folder for the runner
+mkdir actions-runner && cd actions-runner
+
+# Download the latest runner package
+curl -o actions-runner-linux-x64-2.328.0.tar.gz -L \
+https://github.com/actions/runner/releases/download/v2.328.0/actions-runner-linux-x64-2.328.0.tar.gz
+
+# Optional: Validate the hash
+echo "01066fad3a2893e63e6ca880ae3a1fad5bf9329d60e77ee15f2b97c148c3cd4e  actions-runner-linux-x64-2.328.0.tar.gz" | shasum -a 256 -c
+
+# Extract the installer
+tar xzf ./actions-runner-linux-x64-2.328.0.tar.gz
+
+```
+---
+## Configure the Runner
+```bash
+# Create the runner and start the configuration experience
+$ ./config.sh --url https://github.com/hanumantrh/amazon-github-action --token BTFQR2W7B4XCCBTLBOQXAGLI3FO5I
+
+Replace YOUR_RUNNER_TOKEN with the token generated in your repository:
+Settings → Actions → Runners → Add Runner → Generate Token
+```
+---
+## Start the Runner
+```bash
+# Last step, run it!
+$ ./run.sh
+
+```
