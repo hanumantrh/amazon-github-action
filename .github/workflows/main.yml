@@ -1,0 +1,118 @@
+name: Build & Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: self-hosted
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      # ---------------- SonarQube Scan ----------------
+      - uses: sonarsource/sonarqube-scan-action@master
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+
+
+      # Install npm dependencies
+      - name: Install dependencies
+        run: npm install
+        
+
+      # ---------------- Trivy FS Scan ----------------
+      - name: Run Trivy File System Scan
+        run: trivy fs . > trivyfs.txt
+
+
+
+      # ---------------- Set Docker Image Tag ----------------
+      - name: Set Docker Image Tag
+        run: echo "IMAGE_TAG=${{ secrets.DOCKER_USERNAME }}/amazon:${{ github.run_number }}" >> $GITHUB_ENV
+
+      # ---------------- Build & Push Image ----------------
+      - name: Build Docker Image
+        run: |
+          docker rmi -f amazon $IMAGE_TAG || true
+          docker build -t amazon .
+          
+
+      - name: DockerHub Login
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Tag & Push Docker Image
+        run: |
+          docker tag amazon $IMAGE_TAG
+          docker push $IMAGE_TAG
+          docker tag amazon ${{ secrets.DOCKER_USERNAME }}/amazon:latest
+          docker push ${{ secrets.DOCKER_USERNAME }}/amazon:latest
+
+
+      # ---------------- Run Trivy scan ----------------
+      - name: Run Trivy Image Scan
+        run: |
+          echo "🔍 Running Trivy image scan on $IMAGE_TAG"
+
+          # Scan the image for CVEs (ignore exit code so pipeline doesn’t fail on vulnerabilities)
+          trivy image --exit-code 0 --format json -o trivy-image-report.json $IMAGE_TAG
+
+          # Convert JSON to HTML
+          {
+            echo "<html><body>"
+            echo "<h2>Trivy Image Scan Report for $IMAGE_TAG</h2><pre>"
+            jq '.' trivy-image-report.json
+            echo "</pre></body></html>"
+          } > trivy-image-report.html
+
+
+
+
+      # ---------------- Deploy Container ----------------
+      - name: Deploy Container
+        run: |
+          docker rm -f amazon || true
+          docker run -d --name amazon -p 80:80 $IMAGE_TAG
+
+      # ---------------- Upload Reports as Artifacts ----------------
+      - name: Upload Scan Reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: scan-reports
+          path: |
+            trivyfs.txt
+            trivy-image-report.json
+            trivy-image-report.html
+            
+
+      # ---------------- Email Notification ----------------
+      - name: Send Email Notification
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          username: ${{ secrets.EMAIL_USER }}
+          password: ${{ secrets.EMAIL_PASS }}
+          subject: "Pipeline ${{ job.status }}: ${{ github.workflow }} #${{ github.run_number }}"
+          to: ${{ secrets.EMAIL_USER }}
+          from: ${{ secrets.EMAIL_USER }}
+          html_body: |
+            <p>This is a GitHub Actions amazon CICD pipeline status.</p>
+            <p>Workflow: ${{ github.workflow }}</p>
+            <p>Run Number: ${{ github.run_number }}</p>
+            <p>Status: ${{ job.status }}</p>
+            <p>Commit: ${{ github.sha }}</p>
+            <p>Triggered by: ${{ github.actor }}</p>
+            <p>Build URL: <a href="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}">View Build</a></p>
+          attachments: |
+            trivyfs.txt
+            trivy-image-report.json
+            trivy-image-report.html
